@@ -34,7 +34,7 @@ GOOGLE_API_KEY = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 
 ```bash
-# run the following command to store embeddings to pinecone
+# run the following command to store embeddings to Faiss
 python store_index.py
 ```
 
@@ -54,5 +54,5 @@ open up localhost:
 - Python
 - LangChain
 - Flask
-- GPT
+- Gemini
 - Faiss

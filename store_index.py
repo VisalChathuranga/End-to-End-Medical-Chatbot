@@ -1,40 +1,31 @@
-from src.helper import load_pdf_file, text_split, download_hugging_face_embeddings
-from pinecone.grpc import PineconeGRPC as Pinecone
-from pinecone import ServerlessSpec
-from langchain_pinecone import PineconeVectorStore
+from src.helper import load_pdf_file, text_split, get_gemini_embeddings
+from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
 import os
 
 
 load_dotenv()
 
-PINECONE_API_KEY=os.environ.get('PINECONE_API_KEY')
-os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
+GOOGLE_API_KEY=os.environ.get('GOOGLE_API_KEY')
+os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
 
 extracted_data=load_pdf_file(data='Data/')
 text_chunks=text_split(extracted_data)
-embeddings = download_hugging_face_embeddings()
+embeddings = get_gemini_embeddings()
 
+# 1. Create FAISS index from documents
+"""docsearch = FAISS.from_documents(
+    documents=text_chunks,  
+    embedding=embeddings
+) """
 
-pc = Pinecone(api_key=PINECONE_API_KEY)
+# 2: Save the FAISS index locally (optional)
+""" docsearch.save_local("faiss_medicalbot_index") """
 
-index_name = "medicalbot"
-
-
-pc.create_index(
-    name=index_name,
-    dimension=384, 
-    metric="cosine", 
-    spec=ServerlessSpec(
-        cloud="aws", 
-        region="us-east-1"
-    ) 
-) 
-
-# Embed each chunk and upsert the embeddings into your Pinecone index.
-docsearch = PineconeVectorStore.from_documents(
-    documents=text_chunks,
-    index_name=index_name,
-    embedding=embeddings, 
+# 3: Load the FAISS index later (if needed)
+docsearch = FAISS.load_local(
+    folder_path="faiss_medicalbot_index",
+    embeddings=embeddings,
+    allow_dangerous_deserialization=True  # Required for FAISS
 )

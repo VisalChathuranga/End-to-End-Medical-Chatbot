@@ -1,6 +1,7 @@
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+import os
 
 
 #Extract Data From the PDF File
@@ -23,7 +24,9 @@ def text_split(extracted_data):
 
 
 
-#Download the Embeddings from HuggingFace 
-def download_hugging_face_embeddings():
-    embeddings=HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')  #this model return 384 dimensions
+def get_gemini_embeddings():
+    embeddings = GoogleGenerativeAIEmbeddings(
+        model="models/embedding-001", 
+        google_api_key=os.getenv("GOOGLE_API_KEY") 
+    )
     return embeddings
